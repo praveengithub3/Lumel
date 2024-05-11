@@ -1,31 +1,27 @@
 import { Router } from 'express';
-import {basicAuthUser} from "../middleware/checkAuth"
-import {startDirWatch,getDirWatchDetails,getDirWatchDetailsFinishedTask,stopDirWatch,updateDirWatch} from '../controller/task.controller';
-
 const router = Router();
+import {basicAuthUser} from "../middleware/checkAuth"
+import {startDirWatch,stopDirWatch,getDirWatchDetails} from '../controller/task.controller';
+import { checkRequestBodyParams } from '../middleware/Validators';
 
-router.post('/update',
-basicAuthUser,
-updateDirWatch,
-);
+
+
 router.post('/start',
 basicAuthUser,
-startDirWatch, 
+checkRequestBodyParams("directory"),
+startDirWatch,
 );
-
 router.post('/stop',
 basicAuthUser,
+checkRequestBodyParams("directory"),
 stopDirWatch, 
 );
 
-router.get('/getCurrent',
+router.get('/',
 basicAuthUser,
 getDirWatchDetails
 );
 
-router.get('/getFinished', 
-basicAuthUser,
-getDirWatchDetailsFinishedTask
-);
+
 
 export default router;

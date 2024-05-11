@@ -1,102 +1,87 @@
-import { Request, Response } from 'express';
-import { Lumel } from '../model/task.model';
 import * as fs from 'fs';
-import * as path from 'path';
-import { response } from '../helper/commonResponseHandler';
-import {clientError  } from "../helper/ErrorMessage";
+import * as  path from 'path';
+import { Lumel } from "../model/task.model";
+import { response } from "../helper/commonResponseHandler";
 
-var activity= 'Lumel'
+const activity = 'Lumel';
 
-export let updateDirWatch = async (req,res,next) => {
+export const startDirWatch = async (req, res, next) => {
     try {
         const { directory, magicString, interval } = req.body;
-        const dirWatch = new Lumel({ directory, magicString, interval });
+        if (!directory || !magicString || !interval) {
+            return response(req, res, activity, 'Level-2', 'startDirWatch', true, 400, {}, "Directory path, magic string, and interval are required");
+        }
+        if (!fs.existsSync(directory)) {
+            return response(req, res, activity, 'Level-2', 'startDirWatch', true, 400, {}, "Directory does not exist");
+        }
+        let dirWatch = await Lumel.findOne({ directory });
+        if (!dirWatch) {
+            dirWatch = new Lumel({ directory, magicString, interval });
+        } else {
+            dirWatch.magicString = magicString;
+            dirWatch.interval = interval;
+        }
+        dirWatch.status = 1;
+        dirWatch.startedOn = new Date();
         await dirWatch.save();
-        response(req, res, activity, 'Level-2', 'Update-shareAdsPost', true, 200, {},clientError.success.updateSuccess);
 
-    } catch (err: any) {
-        response(req, res, activity, 'Level-2', 'Update-shareAdsPost', true, 500, {},err.message);
+        const watcher = fs.watch(directory, async (eventType, filename) => {
 
-    }
-};
+            console.log(`Event type: ${eventType}, File: ${filename}`);
 
-export let startDirWatch = async (req,res,next) => {
-    try {
-        
-        const dirWatch = await Lumel.findOne({ status: 1 });
-
-        if (!dirWatch) {
-            response(req, res, activity, 'Level-2', 'Update-shareAdsPost', true, 200, {},"dirWatch Not Found");
-        } else {
             
-            dirWatch.status = 1;
-            await dirWatch.save();
-            const watcher = fs.watch(dirWatch.directory, (eventType, filename) => {
-                console.log(`Event type: ${eventType}, File: ${filename}`);
-                if (eventType === 'change') {
-                    const fileContent = fs.readFileSync(path.join(dirWatch.directory, "C:\Desktop\test.text.txt"), 'utf-8');
-                    const occurrences = (fileContent.match(new RegExp(dirWatch.magicString, 'g')) || []).length;
+
+            if (eventType === 'change') {
+                try {
+                    const fileContent = fs.readFileSync(path.join(directory, filename), 'utf-8');
+                    const occurrences = (fileContent.match(new RegExp(magicString, '')) || []).length;
                     console.log(`Magic string occurrences: ${occurrences}`);
+
+                    if (dirWatch) { 
+                        dirWatch.fileContent = fileContent;
+                        dirWatch.occurrences = occurrences;
+                        await dirWatch.save();
+                    }
+                } catch (err) {
+                    console.error('Error reading file or updating database:', err);
                 }
-            });
-          response(req, res, activity, 'Level-2', 'Update-shareAdsPost', true, 200, watcher,"Watch start SuccessFully");
-        }
-    } catch (err: any) {
-        response(req, res, activity, 'Level-2', 'Update-shareAdsPost', true, 500, {},err.message);
+            }
+        });
+
+        response(req, res, activity, 'Level-2', 'startDirWatch', true, 200, 'Directory watch created  successfully', "Directory watch started successfully");
+    } catch (err:any) {
+        response(req, res, activity, 'Level-2', 'startDirWatch', true, 500, {}, err.message);
     }
 };
 
-export let stopDirWatch = async (req, res,next) => {
+export const stopDirWatch = async (req, res, next) => {
     try {
-        
-        const dirWatch = await Lumel.findOne({ status: 1 });
+        const { directory } = req.body;
+        const dirWatch = await Lumel.findOne({ directory, status: 1 });
 
         if (!dirWatch) {
-            response(req, res, activity, 'Level-2', 'Update-shareAdsPost', true, 200, {},"dirWath Not Found");
-        } else {
-            
-            dirWatch.status = 0;
-            dirWatch.stopedOn = new Date(); 
-            await dirWatch.save();
-            response(req, res, activity, 'Level-2', 'Update-shareAdsPost', true, 200, {},clientError.success.savedSuccessfully);
+            return response(req, res, activity, 'Level-2', 'stopDirWatch', true, 400, {}, "Directory watch not found or already stopped");
         }
-    } catch (err: any) {
-        response(req, res, activity, 'Level-2', 'Update-shareAdsPost', true, 500, {},err.message);
+
+        dirWatch.status = 0;
+        dirWatch.stoppedOn = new Date();
+       const data =  await dirWatch.save();
+    response(req, res, activity, 'Level-2', 'stopDirWatch', true, 200, {data}, "Directory watch stopped successfully");
+    } catch (err:any) {
+        response(req, res, activity, 'Level-2', 'stopDirWatch', true, 500, {}, err.message);
     }
 };
 
-
-
-export let getDirWatchDetails = async (req,res,next) => {
+export const getDirWatchDetails = async (req, res, next) => {
     try {
-   
         const dirWatches = await Lumel.find({ status: 1 });
 
         if (dirWatches.length === 0) {
-            response(req, res, activity, 'Level-2', 'Update-shareAdsPost', true, 200, {},"dirWath Not Found");
+            response(req, res, activity, 'Level-2', 'getDirWatchDetails', true, 200, {}, "No active directory watches found");
         } else {
-            response(req, res, activity, 'Level-2', 'Update-shareAdsPost', true, 200, dirWatches,clientError.success.savedSuccessfully);
+            response(req, res, activity, 'Level-2', 'getDirWatchDetails', true, 200, dirWatches, "Active directory watches found");
         }
-    } catch (err: any) {
-        response(req, res, activity, 'Level-2', 'Update-shareAdsPost', true, 500, {},err.message);
+    } catch (err:any) {
+        response(req, res, activity, 'Level-2', 'getDirWatchDetails', true, 500, {}, err.message);
     }
 };
-
-export let getDirWatchDetailsFinishedTask = async (req,res,next) => {
-    try {
-        const dirWatches = await Lumel.find({ 
-            createdAt: { $exists: true, $ne: null },
-            stoppedOn: { $exists: true, $ne: null }
-        });
-        if (dirWatches.length === 0) {
-            response(req, res, activity, 'Level-2', 'Update-shareAdsPost', true, 200, {},"dirWath Not Found");
-        } else {
-            response(req, res, activity, 'Level-2', 'Update-shareAdsPost', true, 200, dirWatches,clientError.success.savedSuccessfully);
-        }
-    } catch (err: any) {
-        response(req, res, activity, 'Level-2', 'Update-shareAdsPost', true, 500, {},err.message);
-    }
-};
-
-
-

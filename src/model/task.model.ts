@@ -12,22 +12,20 @@ export interface LumelDocument extends mongoose.Document {
     modifiedOn: Date;
     modifiedBy: String;
     createdAt: Date;
-    stopedOn: Date;
+    stoppedOn: Date;
 }
 
 const lumelSchema = new mongoose.Schema({
-    _id: { type: mongoose.Types.ObjectId, auto: true },
-    directory: { type: String, required: true },
-    magicString: { type: String, required: true },
-    interval: { type: Number, required: true },
-    status: { type: Number, default: 1 },
-    isDeleted: { type: Boolean, default: false },
-    createdOn: { type: Date },
-    createdBy: { type: String },
-    modifiedOn: { type: Date },
-    modifiedBy: { type: String },
-    createdAt: { type: Date, default: Date.now },
-    stopedOn: { type: Date },
+    directory: {type: String, required: true},
+    magicString: {type: String,required: true},
+    interval: { type: Number,required: true},
+    status: {type: Number,default: 0},
+    fileContent: {type: String, default: ''},
+    occurrences: {type: Number,default: 0},
+    startedOn: {type: Date,default: null},
+    stoppedOn: {type: Date,default: null}
 });
 
-export const  Lumel= mongoose.model("Lumel", lumelSchema);
+export const Lumel= mongoose.model('Lumel', lumelSchema);
+
+
