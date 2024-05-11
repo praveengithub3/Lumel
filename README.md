@@ -66,6 +66,16 @@ curl --location 'http://localhost:2000/api/task/start'
     "interval": 5000
 }'
 
+**Response**
+
+{
+    "success": true,
+    "result": {},
+    "message": "Directory watch started successfully",
+    "extendedMessage": "",
+    "statusCode": 200
+}
+
 **Stop Task:**
 
 curl --location 'http://localhost:2000/api/task/stop' 
@@ -75,11 +85,60 @@ curl --location 'http://localhost:2000/api/task/stop'
     "directory": "C:/Desktop/monitor"
 }'
 
+**Response**
+Response:
+
+{
+    "success": true,
+    "result": {
+        "data": {
+            "_id": "663f2ffbca46a8f023efa21a",
+            "directory": "C:/Desktop/monitor",
+            "magicString": "apple",
+            "interval": 5000,
+            "status": 0,
+            "fileContent": "An apple is the edible fruit of a number of trees, known for its juicy, green, or red fruits. The tree (Malus spp.) is grown worldwide. Its fruit is low-cost, popular, and common all over the earth.\r\n\r\nApplewood is a type of wood that comes from this tree.\r\n\r\nThe apple tree comes from southern Kazakhstan, Kyrgyzstan, Uzbekistan, and northwestern part of China.[1][2][3] Apples have been grown for thousands of years in Asia and Europe. They were brought to North America by European settlers. Apples have religious and mythological significance in many cultures.\r\n\r\nApples are generally grown by grafting, although wild apples grow readily from seed. Apple trees are large if grown from seed, but small if grafted onto roots (rootstock). There are more than 10000 known variants of apples, with a range of desired characteristics. Different variants are bred for various tastes and uses: cooking, eating raw and cider production are the most common uses. In addition to that, when it comes to food toxicity, the seeds in apples can be fatal, but only if they've been crushed. Apples contain amygdalin, which can release cyanide when digested. Though the amount in apple seeds is generally low and requires significant ingestion to be harmful( killing or paralyzing you) it is still important to address such issue.\r\n\r\nTrees and fruit are attacked by fungi, bacteria and pests. In 2010, the fruit's genome was sequenced as part of research on disease control and selective breeding in apple production.",
+            "occurrences": 7,
+            "startedOn": "2024-05-11T08:56:26.914Z",
+            "stoppedOn": "2024-05-11T08:58:10.472Z",
+            "__v": 0
+        }
+    },
+    "message": "Directory watch stopped successfully",
+    "extendedMessage": "",
+    "statusCode": 200
+}
+
 **Get Task Details:**
 
 curl --location 'http://localhost:2000/api/task/' 
 --header 'Authorization: Basic THVtZWw6REFGODdEU0ZEU0ZEU0E5OEZTQURLSkUzMjRLSkwzMkhGRDdGRFNGQjI0MzQzSjQ5RFNG' \
 --data ''
+
+
+**Response**
+
+{
+    "success": true,
+    "result": [
+        {
+            "_id": "663f2ffbca46a8f023efa21a",
+            "directory": "C:/Desktop/monitor",
+            "magicString": "apple",
+            "interval": 5000,
+            "status": 1,
+            "fileContent": "An apple is the edible fruit of a number of trees, known for its juicy, green, or red fruits. The tree (Malus spp.) is grown worldwide. Its fruit is low-cost, popular, and common all over the earth.\r\n\r\nApplewood is a type of wood that comes from this tree.\r\n\r\nThe apple tree comes from southern Kazakhstan, Kyrgyzstan, Uzbekistan, and northwestern part of China.[1][2][3] Apples have been grown for thousands of years in Asia and Europe. They were brought to North America by European settlers. Apples have religious and mythological significance in many cultures.\r\n\r\nApples are generally grown by grafting, although wild apples grow readily from seed. Apple trees are large if grown from seed, but small if grafted onto roots (rootstock). There are more than 10000 known variants of apples, with a range of desired characteristics. Different variants are bred for various tastes and uses: cooking, eating raw and cider production are the most common uses. In addition to that, when it comes to food toxicity, the seeds in apples can be fatal, but only if they've been crushed. Apples contain amygdalin, which can release cyanide when digested. Though the amount in apple seeds is generally low and requires significant ingestion to be harmful( killing or paralyzing you) it is still important to address such issue.\r\n\r\nTrees and fruit are attacked by fungi, bacteria and pests. In 2010, the fruit's genome was sequenced as part of research on disease control and selective breeding in apple production.",
+            "occurrences": 7,
+            "startedOn": "2024-05-11T08:44:43.207Z",
+            "stoppedOn": null,
+            "__v": 0
+        }
+    ],
+    "message": "Active directory watches found",
+    "extendedMessage": "",
+    "statusCode": 200
+}
+
 
 
 ## Database Diagram
