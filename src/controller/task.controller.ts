@@ -34,7 +34,7 @@ export const startDirWatch = async (req, res, next) => {
             if (eventType === 'change') {
                 try {
                     const fileContent = fs.readFileSync(path.join(directory, filename), 'utf-8');
-                    const occurrences = (fileContent.match(new RegExp(magicString, '')) || []).length;
+                    const occurrences = (fileContent.match(new RegExp(magicString, 'g')) || []).length;
                     console.log(`Magic string occurrences: ${occurrences}`);
 
                     if (dirWatch) { 
@@ -48,7 +48,7 @@ export const startDirWatch = async (req, res, next) => {
             }
         });
 
-        response(req, res, activity, 'Level-2', 'startDirWatch', true, 200, 'Directory watch created  successfully', "Directory watch started successfully");
+        response(req, res, activity, 'Level-2', 'startDirWatch', true, 200, {}, "Directory watch started successfully");
     } catch (err:any) {
         response(req, res, activity, 'Level-2', 'startDirWatch', true, 500, {}, err.message);
     }
